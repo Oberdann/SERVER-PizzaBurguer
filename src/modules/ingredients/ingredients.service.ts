@@ -5,22 +5,34 @@ import {
   Ingredient,
   IngredientDocument,
 } from 'src/database/ingredients.schema';
+import { IIngredientsService } from './contracts/ingredients.service-use-case';
+import { IngredientCreateDto } from './dto/ingredients-create';
+import { IngredientResponseDto } from './dto/ingredients-response';
 
 @Injectable()
-export class IngredientsService {
+export class IngredientsService implements IIngredientsService {
   constructor(
     @InjectModel(Ingredient.name)
-    private ingredientModel: Model<IngredientDocument>,
+    private readonly ingredientModel: Model<IngredientDocument>,
   ) {}
 
-  async createTest() {
-    return this.ingredientModel.create({
-      name: 'Queijo',
-      isActive: true,
-    });
+  async createIngredients(ingredientDto: IngredientCreateDto) {
+    const ingredientEntity = await this.ingredientModel.create(ingredientDto);
+
+    return this.toResponse(ingredientEntity);
   }
 
-  async findAll() {
+  async findAllIngredients() {
     return this.ingredientModel.find();
+  }
+
+  private toResponse(doc: IngredientDocument): IngredientResponseDto {
+    return {
+      id: doc.id,
+      name: doc.name,
+      isActive: doc.isActive,
+      createdAt: doc.createdAt.toString(),
+      updatedAt: doc.updatedAt.toString(),
+    };
   }
 }

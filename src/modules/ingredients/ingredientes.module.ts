@@ -12,6 +12,11 @@ import { IngredientsSchema } from '../../database/ingredients.schema';
     ]),
   ],
   controllers: [IngredientsController],
-  providers: [IngredientsService],
+  providers: [
+    {
+      provide: 'IIngredientsService',
+      useClass: IngredientsService,
+    },
+  ],
 })
 export class IngredientsModule {}
