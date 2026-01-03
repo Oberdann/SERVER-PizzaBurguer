@@ -16,13 +16,15 @@ export class IngredientsService implements IIngredientsService {
     private readonly ingredientModel: Model<IngredientDocument>,
   ) {}
 
-  async createIngredients(ingredientDto: IngredientCreateDto) {
+  async createIngredients(
+    ingredientDto: IngredientCreateDto,
+  ): Promise<IngredientResponseDto> {
     const ingredientEntity = await this.ingredientModel.create(ingredientDto);
 
     return this.toResponse(ingredientEntity);
   }
 
-  async findAllIngredients() {
+  async findAllIngredients(): Promise<IngredientResponseDto[]> {
     return this.ingredientModel.find();
   }
 

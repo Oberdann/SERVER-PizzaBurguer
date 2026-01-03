@@ -6,5 +6,5 @@ export interface IIngredientsService {
     ingredientDto: IngredientCreateDto,
   ): Promise<IngredientResponseDto>;
 
-  findAllIngredients();
+  findAllIngredients(): Promise<IngredientResponseDto[]>;
 }
