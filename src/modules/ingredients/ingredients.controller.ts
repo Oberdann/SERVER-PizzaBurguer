@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, Inject, Post } from '@nestjs/common';
 import { IngredientsService } from './ingredients.service';
 import { IngredientCreateDto } from './dto/ingredients-create';
+import { Ok } from 'src/common/utils/response.util';
 
 @Controller('ingredients')
 export class IngredientsController {
@@ -11,19 +12,19 @@ export class IngredientsController {
 
   @HttpCode(201)
   @Post()
-  async createIngredients(@Body() ingredient: IngredientCreateDto) {
+  async createIngredient(@Body() ingredient: IngredientCreateDto) {
     const ingredientResponse =
-      await this.ingredientsService.createIngredients(ingredient);
+      await this.ingredientsService.createIngredient(ingredient);
 
-    return {
-      message: 'Ingrediente criado com sucesso',
-      data: ingredientResponse,
-    };
+    return Ok('Ingrediente criado com sucesso', ingredientResponse);
   }
 
   @HttpCode(200)
   @Get('allIngredients')
-  async findAll() {
-    return await this.ingredientsService.findAllIngredients();
+  async getAll() {
+    const ingredientsReponse =
+      await this.ingredientsService.getAllIngredients();
+
+    return Ok('Ingredientes encontrados com sucesso', ingredientsReponse);
   }
 }

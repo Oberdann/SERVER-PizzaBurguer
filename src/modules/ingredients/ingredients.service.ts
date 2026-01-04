@@ -16,7 +16,7 @@ export class IngredientsService implements IIngredientsService {
     private readonly ingredientModel: Model<IngredientDocument>,
   ) {}
 
-  async createIngredients(
+  async createIngredient(
     ingredientDto: IngredientCreateDto,
   ): Promise<IngredientResponseDto> {
     const ingredientEntity = await this.ingredientModel.create(ingredientDto);
@@ -24,7 +24,7 @@ export class IngredientsService implements IIngredientsService {
     return this.toResponse(ingredientEntity);
   }
 
-  async findAllIngredients(): Promise<IngredientResponseDto[]> {
+  async getAllIngredients(): Promise<IngredientResponseDto[]> {
     return this.ingredientModel.find();
   }
 

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { ExceptionGlobalFilter } from './common/filters/exception-global-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,14 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalFilters(new ExceptionGlobalFilter());
+
+  // app.enableCors({
+  //   origin: 'http://localhost:3000',
+  //   methods: 'GET,POST,PUT,DELETE',
+  //   credentials: true,
+  // });
 
   const config = new DocumentBuilder()
     .setTitle('Servidor - Pizza Burguer')
