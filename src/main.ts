@@ -1,15 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
-import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ExceptionGlobalFilter } from '../src/common/filters/exception-global-filter';
-
-const server = express();
+import { ValidationPipe } from '@nestjs/common';
+import { ExceptionGlobalFilter } from './common/filters/exception-global-filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
 
@@ -23,18 +19,33 @@ async function bootstrap() {
 
   app.useGlobalFilters(new ExceptionGlobalFilter());
 
+  // app.enableCors({
+  //   origin: 'http://localhost:3000',
+  //   methods: 'GET,POST,PUT,DELETE',
+  //   credentials: true,
+  // });
+
   const config = new DocumentBuilder()
     .setTitle('Servidor - Pizza Burguer')
     .setDescription('Software para retirada de pedidos da pizzaria')
     .setVersion('0.0.1')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('doc', app, document);
 
-  await app.init();
+  await app.listen(process.env.PORT ?? 8080);
 }
 
-bootstrap();
-
-export default server;
+void bootstrap();
