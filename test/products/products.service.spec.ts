@@ -10,6 +10,12 @@ import { ProductCreateDto } from 'src/modules/products/dto/product-create-dto';
 import { ProductStatusAlreadySetException } from 'src/modules/products/exceptions/exception-product-status-already';
 import { ProductResponseDto } from 'src/modules/products/dto/product-response-dto';
 import { ProductNoIngredientsIdDto } from 'src/modules/products/dto/product-no-ingredients-id-dto';
+import { ProductType } from 'src/common/enums/product-type-enum';
+import { PriceMode } from 'src/common/enums/price-mode-enum';
+import { ProductInvalidSlicePriceModeException } from 'src/modules/products/exceptions/exception-product-invalid-slice-price';
+import { ProductInvalidNoSizePriceModeException } from 'src/modules/products/exceptions/exception-product-invalid-no-size-price';
+import { ProductInvalidSizePriceModeException } from 'src/modules/products/exceptions/exception-product-invalid-size-price';
+import { ProductInvalidNoSlicePriceModeException } from 'src/modules/products/exceptions/exception-product-invalid-no-slice-price';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -35,6 +41,9 @@ describe('ProductsService', () => {
     category: mockProduct.category,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    type: ProductType.PIZZA,
+    priceMode: PriceMode.SLICE,
+    prices: [],
   };
 
   const mockProductNoIngredientsDto: ProductNoIngredientsIdDto = {
@@ -158,9 +167,18 @@ describe('ProductsService', () => {
     it('should create product and return mapped', async () => {
       const dto: ProductCreateDto = {
         name: 'Produto Teste',
+        type: ProductType.PIZZA,
         category: ProductCategory.COXINHA,
         ingredients: [],
-      } as any;
+        priceMode: PriceMode.SLICE,
+        prices: [
+          {
+            slices: 8,
+            value: 50,
+          },
+        ],
+        isActive: true,
+      };
 
       const productDocumentMock = {
         ...dto,
@@ -185,6 +203,70 @@ describe('ProductsService', () => {
 
       expect(result).toEqual(mockProductResponseDto);
       expect(productModel.create).toHaveBeenCalledWith(productDocumentMock);
+    });
+
+    it('should throw when SLICE mode and price without slices', async () => {
+      const dto: ProductCreateDto = {
+        name: 'Teste',
+        type: ProductType.PIZZA,
+        category: ProductCategory.COXINHA,
+        ingredients: [],
+        priceMode: PriceMode.SLICE,
+        prices: [{ value: 50 }],
+        isActive: true,
+      };
+
+      await expect(service.create(dto)).rejects.toThrow(
+        ProductInvalidSlicePriceModeException,
+      );
+    });
+
+    it('should throw when SLICE mode contains size', async () => {
+      const dto: ProductCreateDto = {
+        name: 'Teste',
+        type: ProductType.PIZZA,
+        category: ProductCategory.COXINHA,
+        ingredients: [],
+        priceMode: PriceMode.SLICE,
+        prices: [{ slices: 8, size: 'G', value: 50 }],
+        isActive: true,
+      };
+
+      await expect(service.create(dto)).rejects.toThrow(
+        ProductInvalidNoSizePriceModeException,
+      );
+    });
+
+    it('should throw when SIZE mode and missing size', async () => {
+      const dto: ProductCreateDto = {
+        name: 'Teste',
+        type: ProductType.PIZZA,
+        category: ProductCategory.COXINHA,
+        ingredients: [],
+        priceMode: PriceMode.SIZE,
+        prices: [{ value: 50 }],
+        isActive: true,
+      };
+
+      await expect(service.create(dto)).rejects.toThrow(
+        ProductInvalidSizePriceModeException,
+      );
+    });
+
+    it('should throw when SIZE mode contains slices', async () => {
+      const dto: ProductCreateDto = {
+        name: 'Teste',
+        type: ProductType.PIZZA,
+        category: ProductCategory.COXINHA,
+        ingredients: [],
+        priceMode: PriceMode.SIZE,
+        prices: [{ size: 'G', slices: 8, value: 50 }],
+        isActive: true,
+      };
+
+      await expect(service.create(dto)).rejects.toThrow(
+        ProductInvalidNoSlicePriceModeException,
+      );
     });
   });
 
