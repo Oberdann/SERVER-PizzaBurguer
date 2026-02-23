@@ -13,6 +13,7 @@ import { Ok } from 'src/common/utils/response.util';
 import { IOrdersService } from './contracts/order.service-use-case';
 import { OrderCreateDto } from './dto/order-create-dto';
 import { OrderStatus } from 'src/common/enums/order-status-enum';
+import { OrderUpdateStatusDto } from './dto/order-update-status-dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -49,7 +50,7 @@ export class OrdersController {
   @Put(':id/status')
   async updateStatus(
     @Param('id') id: string,
-    @Body() body: { status: OrderStatus },
+    @Body() body: OrderUpdateStatusDto,
   ) {
     const response = await this.orderService.updateStatus(id, body.status);
 

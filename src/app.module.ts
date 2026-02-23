@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IngredientsModule } from './modules/ingredients/ingredients.module';
 import { ProductsModule } from './modules/products/products.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ProductsModule } from './modules/products/products.module';
     MongooseModule.forRoot(process.env.DATABASE_URL ?? ''),
     IngredientsModule,
     ProductsModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

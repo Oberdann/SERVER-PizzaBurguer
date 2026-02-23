@@ -7,7 +7,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderItemDto } from './order-item-dto';
+import { OrderItemCreateDto } from './order-item-create-dto';
+import { OrderAddressCreateDto } from './order-address-create-dto';
 
 export class OrderCreateDto {
   @ApiProperty({
@@ -20,7 +21,7 @@ export class OrderCreateDto {
 
   @ApiProperty({
     example: '11999999999',
-    description: 'Telefone do cliente',
+    description: 'Telefone do cliente (somente números)',
   })
   @IsString({ message: 'O campo [customerPhone] precisa ser uma string.' })
   @IsNotEmpty({ message: 'O campo [customerPhone] não pode estar vazio.' })
@@ -30,12 +31,20 @@ export class OrderCreateDto {
   customerPhone: string;
 
   @ApiProperty({
-    description: 'Itens do pedido',
-    type: [OrderItemDto],
+    type: OrderAddressCreateDto,
+    description: 'Endereço do pedido',
+  })
+  @ValidateNested()
+  @Type(() => OrderAddressCreateDto)
+  address: OrderAddressCreateDto;
+
+  @ApiProperty({
+    type: [OrderItemCreateDto],
+    description: 'Lista de itens do pedido',
   })
   @IsArray({ message: 'O campo [items] precisa ser um array.' })
   @IsNotEmpty({ message: 'O campo [items] não pode estar vazio.' })
   @ValidateNested({ each: true })
-  @Type(() => OrderItemDto)
-  items: OrderItemDto[];
+  @Type(() => OrderItemCreateDto)
+  items: OrderItemCreateDto[];
 }
