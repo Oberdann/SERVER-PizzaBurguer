@@ -8,7 +8,7 @@ import { ObjectIdParamPipe } from './common/filters/objectId-validation-pipe';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -47,7 +47,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('doc', app, document);
 
-  await app.init();
+  await app.listen(process.env.PORT ?? 8080);
 }
 
 void bootstrap();
