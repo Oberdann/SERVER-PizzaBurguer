@@ -10,7 +10,7 @@ describe('IngredientsService', () => {
   let service: IngredientsService;
   let ingredientModel: any;
   let mapper: jest.Mocked<IIngredientMapper>;
-  let productsService: Partial<jest.Mocked<IProductsService>>;
+  // let productsService: Partial<jest.Mocked<IProductsService>>;
 
   const mockIngredient = {
     _id: new Types.ObjectId(),
@@ -59,7 +59,7 @@ describe('IngredientsService', () => {
     service = module.get<IngredientsService>(IngredientsService);
     ingredientModel = module.get(getModelToken('Ingredient'));
     mapper = module.get('IIngredientMapper');
-    productsService = module.get('IProductsService');
+    // productsService = module.get('IProductsService');
   });
 
   afterEach(() => {

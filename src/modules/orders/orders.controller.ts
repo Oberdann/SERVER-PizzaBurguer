@@ -12,7 +12,6 @@ import {
 import { Ok } from 'src/common/utils/response.util';
 import { IOrdersService } from './contracts/order.service-use-case';
 import { OrderCreateDto } from './dto/order-create-dto';
-import { OrderStatus } from 'src/common/enums/order-status-enum';
 import { OrderUpdateStatusDto } from './dto/order-update-status-dto';
 
 @Controller('orders')
