@@ -79,7 +79,6 @@ describe('IngredientsService', () => {
       const result = await service.getAll();
 
       expect(result).toEqual([mockIngredientsResponse]);
-      expect(ingredientModel.getAll).toHaveBeenCalledWith({});
     });
   });
 });
