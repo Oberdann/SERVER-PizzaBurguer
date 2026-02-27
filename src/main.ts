@@ -4,21 +4,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ExceptionGlobalFilter } from './common/filters/exception-global-filter';
 import { ObjectIdParamPipe } from './common/filters/objectId-validation-pipe';
-import * as express from 'express';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import serverlessExpress from '@vendia/serverless-express';
 
-const expressApp = express();
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
 
-let server: any;
-
-async function bootstrapNest() {
-  const app = await NestFactory.create(
-    AppModule,
-    new ExpressAdapter(expressApp),
-  );
-
-  app.setGlobalPrefix('v1'); // só "v1", a Vercel já adiciona /api
+  // app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,10 +17,16 @@ async function bootstrapNest() {
       transform: true,
     }),
   );
+
   app.useGlobalFilters(new ExceptionGlobalFilter());
   app.useGlobalPipes(new ObjectIdParamPipe());
 
-  // Swagger
+  // app.enableCors({
+  //   origin: 'http://localhost:3000',
+  //   methods: 'GET,POST,PUT,DELETE',
+  //   credentials: true,
+  // });
+
   const config = new DocumentBuilder()
     .setTitle('Servidor - Pizza Burguer')
     .setDescription('Software para retirada de pedidos da pizzaria')
@@ -48,19 +44,10 @@ async function bootstrapNest() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('doc', app, document);
 
   await app.init();
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return serverlessExpress({ app: expressApp });
 }
 
-// Export único que a Vercel vai chamar
-export const handler = async (event: any, context: any) => {
-  if (!server) {
-    server = await bootstrapNest();
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return server(event, context);
-};
+void bootstrap();
