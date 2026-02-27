@@ -3,7 +3,7 @@ name: CI - PizzaBurguder (Vercel)
 on:
   push:
     branches:
-      - verce-deploy
+      - vercel-deploy
 
 jobs:
   build-aplicacao:
