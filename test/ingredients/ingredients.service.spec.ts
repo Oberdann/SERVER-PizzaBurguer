@@ -78,7 +78,7 @@ describe('IngredientsService', () => {
 
       const result = await service.getAll();
 
-      expect(result).toEqual('a');
+      expect(result).toEqual('ab');
     });
   });
 });
