@@ -4,9 +4,17 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ExceptionGlobalFilter } from './common/filters/exception-global-filter';
 import { ObjectIdParamPipe } from './common/filters/objectId-validation-pipe';
+import * as express from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import serverlessExpress from '@vendia/serverless-express';
+
+const expressApp = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
 
   app.setGlobalPrefix('api/v1');
 
@@ -53,3 +61,5 @@ async function bootstrap() {
 }
 
 void bootstrap();
+
+export const handler = serverlessExpress({ app: expressApp });
