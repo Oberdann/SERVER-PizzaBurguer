@@ -10,13 +10,15 @@ import serverlessExpress from '@vendia/serverless-express';
 
 const expressApp = express();
 
-async function bootstrap() {
+let server: any;
+
+async function bootstrapNest() {
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(expressApp),
   );
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('v1'); // só "v1", a Vercel já adiciona /api
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,16 +27,10 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
   app.useGlobalFilters(new ExceptionGlobalFilter());
   app.useGlobalPipes(new ObjectIdParamPipe());
 
-  // app.enableCors({
-  //   origin: 'http://localhost:3000',
-  //   methods: 'GET,POST,PUT,DELETE',
-  //   credentials: true,
-  // });
-
+  // Swagger
   const config = new DocumentBuilder()
     .setTitle('Servidor - Pizza Burguer')
     .setDescription('Software para retirada de pedidos da pizzaria')
@@ -52,14 +48,19 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('doc', app, document);
 
-  // await app.listen(process.env.PORT ?? 8080);
-
   await app.init();
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return serverlessExpress({ app: expressApp });
 }
 
-void bootstrap();
-
-export const handler = serverlessExpress({ app: expressApp });
+// Export único que a Vercel vai chamar
+export const handler = async (event: any, context: any) => {
+  if (!server) {
+    server = await bootstrapNest();
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return server(event, context);
+};
